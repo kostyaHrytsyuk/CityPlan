@@ -80,5 +80,7 @@ class Building:
         return True
 
     def correct(self):
-        self.check_neighbours()
-        return self.check_edges()
+        if self.check_edges():
+            if self.check_neighbours():
+                return True
+        return False
