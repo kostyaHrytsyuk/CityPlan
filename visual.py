@@ -54,4 +54,4 @@ if __name__ == '__main__':
         new_city.possible_building.append(new_build)
 
     for i in new_city.possible_building:
-        i.structura[0]
+        i.draw()

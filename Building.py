@@ -6,14 +6,21 @@ class Building:
         self.structure = []
         self.save_structure(structura)
         self.cordinates = self.mathematical()
-        self.correct = self.correct()
+        # self.correct = self.correct()
 
     def save_structure(self, structure):
-        for i in structure:
-            self.structure.append(i[:-1])
+        for i in range(len(structure)-1):
+            self.structure.append(structure[i][:-1])
+        var = structure[len(structure)-1][-1]
+        if var == '\n':
+            self.structure.append(structure[len(structure)-1][:-1])
+        else:
+            self.structure.append(structure[len(structure) - 1])
 
     def draw(self):
-        pass
+        print('-----------------')
+        for i in self.structure:
+            print(i)
 
     def mathematical(self):
 
