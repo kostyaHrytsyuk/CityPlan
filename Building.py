@@ -11,3 +11,5 @@ class Building:
 
     def corect(self):
         pass
+
+    def save_st

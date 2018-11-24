@@ -46,6 +46,7 @@ if __name__ == '__main__':
     for build in range(len(sorted_information[1])):
 
         info_about_building = sorted_information[1][build]
+
         construction = sorted_information[2][build]
 
         new_build = Building(info_about_building, construction)
@@ -54,8 +55,4 @@ if __name__ == '__main__':
 
     for i in new_city.possible_building:
         print(i.structura)
-        for j in i.structura:
-            if j[-2:] == '\n':
-                print(j[:-2])
-            else:
-                print(j)
+        # for j in i.structura:
