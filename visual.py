@@ -3,5 +3,5 @@ def show():
         for line in f:
             print(line)
 
-
-show()
+if __name__ == '__main__':
+    show()
