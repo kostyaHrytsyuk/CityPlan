@@ -5,13 +5,47 @@ class Building:
         self.columns = general_information[2]
         self.structure = []
         self.save_structure(structura)
+        self.cordinates = self.mathematical()
+        self.correct = self.correct()
 
-    def save_structure(self, struct):
-        for i in struct:
+    def save_structure(self, structure):
+        for i in structure:
             self.structure.append(i[:-1])
 
     def draw(self):
         pass
 
-    def corect(self):
-        pass
+    def mathematical(self):
+
+        structura =[ i for i in self.structure]
+        str_structura = ''
+        for i in structura:
+            str_structura += i
+
+        cordinate = [[i, j] for i in range(len(structura)) for j in range(len(structura[0]))]
+
+        print(str_structura)
+
+        for i in range(len(str_structura)):
+            if str_structura[i] == '.':
+                cordinate[i].append([0])
+            elif str_structura[i] == '#':
+                cordinate[i].append([1])
+
+        print(cordinate)
+
+        return cordinate
+
+    def correct(self):
+        chk = True
+        if chk:
+            edge1 = self.structure[0]
+            if '#' not in edge1:
+                chk = False
+
+
+        edge2 = 0
+        edge3 = 0
+        edge4 = 0
+
+        return chk

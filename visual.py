@@ -3,7 +3,7 @@ from Building import Building
 
 
 def show(data):
-    with open("a_example.in") as f:
+    with open(data) as f:
         # for line in f:
         #     print(line)
         info = f.readlines()
@@ -54,5 +54,4 @@ if __name__ == '__main__':
         new_city.possible_building.append(new_build)
 
     for i in new_city.possible_building:
-        for j in i.structure:
-            print(j)
+        i.structura[0]
