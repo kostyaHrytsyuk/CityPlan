@@ -1,11 +1,11 @@
 class Building:
     def __init__(self, general_information, structura):
         self.type = general_information[0]
-        self.rows = general_information[1]
-        self.columns = general_information[2]
+        self.rows = int(general_information[2])
+        self.columns = int(general_information[4])
         self.structure = []
         self.save_structure(structura)
-        self.cordinates = self.mathematical()
+        self.coordinates = self.mathematical()
         self.correct = self.correct()
 
     def save_structure(self, structure):
@@ -36,16 +36,49 @@ class Building:
 
         return cordinate
 
-    def correct(self):
-        chk = True
-        if chk:
-            edge1 = self.structure[0]
-            if '#' not in edge1:
-                chk = False
+    def check_edges(self):
+        edge1_lst = self.structure[0]
+        edge2_lst = ''
+        edge3_lst = ''
+        for i in range(len(self.structure)):
+            edge2_lst += self.structure[i][0]
+            edge3_lst += self.structure[i][self.columns - 1]
+        edge_lst4 = self.structure[self.rows - 1]
 
+        def cor(data):
+            return True if '#' in data else False
 
-        edge2 = 0
-        edge3 = 0
-        edge4 = 0
+        chk = False
 
+        if cor(edge1_lst):
+            if cor(edge2_lst):
+                if cor(edge3_lst):
+                    if cor(edge_lst4):
+                        chk = True
         return chk
+
+    def check_neighbours(self):
+        neighbours = []
+        for i in range(len(self.structure)):
+            for j in range(self.columns-1):
+                cur = self.structure[i][j]
+                if i-1 >= 0:
+                    up = self.structure[i-1][j]
+                    neighbours.append(up)
+                if j-1 >= 0:
+                    left = self.structure[i][j-1]
+                    neighbours.append(left)
+                if i+1 <= self.rows:
+                    bot = self.structure[i+1][j]
+                    neighbours.append(bot)
+                if j+1 <= self.columns:
+                    right = self.structure[i][j+1]
+                    neighbours.append(right)
+
+                if '#' not in neighbours:
+                    return False
+        return True
+
+    def correct(self):
+        self.check_neighbours()
+        return self.check_edges()
