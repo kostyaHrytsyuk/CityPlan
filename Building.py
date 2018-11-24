@@ -75,10 +75,10 @@ class Building:
                 if j-1 >= 0:
                     left = self.structure[i][j-1]
                     neighbours.append(left)
-                if i+1 <= self.rows:
+                if i+1 < self.rows:
                     bot = self.structure[i+1][j]
                     neighbours.append(bot)
-                if j+1 <= self.columns:
+                if j+1 < self.columns:
                     right = self.structure[i][j+1]
                     neighbours.append(right)
 
