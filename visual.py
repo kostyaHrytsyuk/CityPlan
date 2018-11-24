@@ -1,4 +1,5 @@
 from City import City
+from Building import Building
 
 
 def show(data):
@@ -9,29 +10,52 @@ def show(data):
     return info
 
 
-def make_city(data, new_city: City):
+def make_city(data):
+    result = []
+    city_info = [data[0]]
 
-    city_info = []
-    building_info = []
-    count = 0
+    def parse_building(data):
 
-    for element in data:
-        if count == 0:
-            city_info = element.split(" ")
-            for i in city_info:
-                i.replace("\n", '')
-            print(city_info)
+        result = []
+        construction_building = []
 
-    return city_info
+        for index_element in range(1, len(data)):
+            temporary_lst = []
+
+            if data[index_element][0] == 'R' or data[index_element][0] == 'U':
+                length = data[index_element][2]
+                result.append(data[index_element])
+                temporary_lst = data[int(index_element+1):int(index_element)+1+int(length)]
+                construction_building.append(temporary_lst)
+        return [result, construction_building]
+
+    new = parse_building(data)
+    result = city_info + new
+
+    return result
 
 
 if __name__ == '__main__':
     data = "a_example.in"
     information = show(data)
-    # print(information)
-    # first_data = information[0].split(" ")
-    # print("Here",first_data)
-    # for i in information:
-    #     print(i)
-    new_city = City()
-    make_city(information, new_city)
+
+    sorted_information = make_city(information)
+
+    new_city = City(sorted_information[0])
+
+    for build in range(len(sorted_information[1])):
+
+        info_about_building = sorted_information[1][build]
+        construction = sorted_information[2][build]
+
+        new_build = Building(info_about_building, construction)
+
+        new_city.possible_building.append(new_build)
+
+    for i in new_city.possible_building:
+        print(i.structura)
+        for j in i.structura:
+            if j[-2:] == '\n':
+                print(j[:-2])
+            else:
+                print(j)

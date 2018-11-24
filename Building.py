@@ -3,7 +3,8 @@ class Building:
         self.type = general_information[0]
         self.rows = general_information[1]
         self.columns = general_information[2]
-        self.structure = structura
+
+        self.structura = structura
 
     def draw(self):
         pass

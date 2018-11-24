@@ -1,8 +1,10 @@
 class City:
-    def __init__(self):
-        self.columns = 0
-        self.rows = 0
-        self.distance = 0
+    def __init__(self, data):
+        self.rows = data[0]
+        self.columns = data[2]
+        self.distance = data[4]
+
+        self.possible_building = []
 
     def build(self):
         pass
