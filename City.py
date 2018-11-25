@@ -9,5 +9,5 @@ class City:
     def build(self):
         pass
 
-    def setInfo(self, columns):
+    def set_info(self, columns):
         self.columns = columns

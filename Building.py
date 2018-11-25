@@ -2,12 +2,12 @@ from Coordinates import *
 
 
 class Building:
-    def __init__(self, general_information, structura):
+    def __init__(self, general_information, structure):
         self.type = general_information[0]
         self.rows = int(general_information[2])
         self.columns = int(general_information[4])
         self.structure = []
-        self.save_structure(structura)
+        self.save_structure(structure)
         self.coordinates = self.mathematical()
         self.correct = self.correct()
 
@@ -26,22 +26,20 @@ class Building:
             print(i)
 
     def mathematical(self):
+        str_structure = ''
+        for i in self.structure:
+            str_structure += i
 
-        structura =[i for i in self.structure]
-        str_structura = ''
-        for i in structura:
-            str_structura += i
+        raw_coordinates = [[i, j] for i in range(len(self.structure)) for j in range(len(self.structure[0]))]
 
-        raw_cordinate = [[i, j] for i in range(len(structura)) for j in range(len(structura[0]))]
-
-        for i in range(len(str_structura)):
-            if str_structura[i] == '.':
-                raw_cordinate[i].append(str_structura[i])
-            elif str_structura[i] == '#':
-                raw_cordinate[i].append(str_structura[i])
+        for i in range(len(str_structure)):
+            if str_structure[i] == '.':
+                raw_coordinates[i].append(str_structure[i])
+            elif str_structure[i] == '#':
+                raw_coordinates[i].append(str_structure[i])
 
         coordinates = []
-        for p in raw_cordinate:
+        for p in raw_coordinates:
             coordinates.append(Coordinates(p[0], p[1], p[2]))
 
         return coordinates
@@ -71,7 +69,6 @@ class Building:
         neighbours = []
         for i in range(len(self.structure)):
             for j in range(self.columns-1):
-                cur = self.structure[i][j]
                 if i-1 >= 0:
                     up = self.structure[i-1][j]
                     neighbours.append(up)

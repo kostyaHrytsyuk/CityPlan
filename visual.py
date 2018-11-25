@@ -2,42 +2,36 @@ from City import City
 from Building import Building
 
 
-def show(data):
-    with open(data) as f:
-        # for line in f:
-        #     print(line)
+def read_input_file(file):
+    with open(file) as f:
         info = f.readlines()
     return info
 
 
-def make_city(data):
-    result = []
-    city_info = [data[0]]
+def make_city(city_data):
+    city_info = [city_data[0]]
 
     def parse_building(data):
 
-        result = []
+        build_info = []
         construction_building = []
 
         for index_element in range(1, len(data)):
-            temporary_lst = []
-
             if data[index_element][0] == 'R' or data[index_element][0] == 'U':
                 length = data[index_element][2]
-                result.append(data[index_element])
+                build_info.append(data[index_element])
                 temporary_lst = data[int(index_element+1):int(index_element)+1+int(length)]
                 construction_building.append(temporary_lst)
-        return [result, construction_building]
+        return [build_info, construction_building]
 
-    new = parse_building(data)
+    new = parse_building(city_data)
     result = city_info + new
 
     return result
 
 
 if __name__ == '__main__':
-    data = "a_example.in"
-    information = show(data)
+    information = read_input_file("a_example.in")
 
     sorted_information = make_city(information)
 
