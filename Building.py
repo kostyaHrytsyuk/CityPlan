@@ -1,3 +1,6 @@
+from Coordinates import *
+
+
 class Building:
     def __init__(self, general_information, structura):
         self.type = general_information[0]
@@ -24,24 +27,24 @@ class Building:
 
     def mathematical(self):
 
-        structura =[ i for i in self.structure]
+        structura =[i for i in self.structure]
         str_structura = ''
         for i in structura:
             str_structura += i
 
-        cordinate = [[i, j] for i in range(len(structura)) for j in range(len(structura[0]))]
-
-        print(str_structura)
+        raw_cordinate = [[i, j] for i in range(len(structura)) for j in range(len(structura[0]))]
 
         for i in range(len(str_structura)):
             if str_structura[i] == '.':
-                cordinate[i].append([0])
+                raw_cordinate[i].append(str_structura[i])
             elif str_structura[i] == '#':
-                cordinate[i].append([1])
+                raw_cordinate[i].append(str_structura[i])
 
-        print(cordinate)
+        coordinates = []
+        for p in raw_cordinate:
+            coordinates.append(Coordinates(p[0], p[1], p[2]))
 
-        return cordinate
+        return coordinates
 
     def check_edges(self):
         edge1_lst = self.structure[0]
