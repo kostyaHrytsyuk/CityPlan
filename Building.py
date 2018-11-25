@@ -1,4 +1,5 @@
 from Coordinates import *
+from City import *
 
 
 class Building:
@@ -91,3 +92,9 @@ class Building:
             if self.check_neighbours():
                 return True
         return False
+
+    def get_building_size(self):
+        a = self.coordinates[0].point
+        b = self.coordinates[-1].point
+        size = City.manhattan_distance(a, b)
+        return size
