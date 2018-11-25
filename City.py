@@ -10,6 +10,8 @@ class City:
         self.rows = int(sorted_information[0][0])
         self.columns = int(sorted_information[0][2])
         self.distance = int(sorted_information[0][4])
+        self.possible_residentials = City.sort_buildings(self.possible_residentials)
+        self.possible_utilities = City.sort_buildings(self.possible_utilities)
 
     def build(self):
         pass
@@ -52,3 +54,7 @@ class City:
                     self.possible_utilities.append(new_build)
 
         return result
+
+    @staticmethod
+    def sort_buildings(buildings):
+        return sorted(buildings, key=lambda a: a.get_building_size())
