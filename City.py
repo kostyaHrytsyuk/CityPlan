@@ -1,5 +1,5 @@
-from Residential import *
-from Utility import *
+from Buildings.Residential import *
+from Buildings.Utility import *
 
 
 class City:

@@ -1,8 +1,8 @@
-from Building import *
+from Buildings.Building import *
 
 
-class Residential(Building):
+class Utility(Building):
 
     def __init__(self, general_information, structure):
         super().__init__(general_information, structure)
-        self.capacity = general_information[6]
+        self.service_type = general_information[6]
