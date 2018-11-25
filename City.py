@@ -6,6 +6,7 @@ class City:
     def __init__(self, data):
         self.possible_residentials = []
         self.possible_utilities = []
+        self.residentials = []
         sorted_information = City.__make_city(self, data)
         self.rows = int(sorted_information[0][0])
         self.columns = int(sorted_information[0][2])
@@ -58,3 +59,8 @@ class City:
     @staticmethod
     def sort_buildings(buildings):
         return sorted(buildings, key=lambda a: a.get_building_size())
+
+    def get_score(self):
+        score = 0
+        for r in self.residentials:
+            score += r.capacity * len(r.utilities_around)
