@@ -1,5 +1,5 @@
 from Coordinates import *
-from City import *
+from ManhattanHelper import *
 
 
 class Building:
@@ -96,5 +96,5 @@ class Building:
     def get_building_size(self):
         a = self.coordinates[0].point
         b = self.coordinates[-1].point
-        size = City.manhattan_distance(a, b)
+        size = ManhattanHelper.manhattan_distance(a, b)
         return size
