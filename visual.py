@@ -1,5 +1,5 @@
-from City import City
-from Building import Building
+from Residential import *
+from Utility import *
 
 
 def read_input_file(file):
@@ -43,9 +43,15 @@ if __name__ == '__main__':
 
         construction = sorted_information[2][build]
 
-        new_build = Building(info_about_building, construction)
+        if info_about_building[0] == 'R':
+            new_build = Residential(info_about_building, construction)
+            if new_build.correct:
+                new_city.possible_residentials.append(new_build)
+        else:
+            new_build = Utility(info_about_building, construction)
+            if new_build.correct:
+                new_city.possible_utilities.append(new_build)
 
-        new_city.possible_building.append(new_build)
-
-    for i in new_city.possible_building:
+    for i in new_city.possible_utilities:
+        i.draw()
         print(i.get_building_size())

@@ -10,7 +10,7 @@ class Building:
         self.structure = []
         self.save_structure(structure)
         self.coordinates = self.mathematical()
-        self.correct = self.correct()
+        self.correct = self.__correct()
 
     def save_structure(self, structure):
         for i in range(len(structure)-1):
@@ -87,7 +87,7 @@ class Building:
                     return False
         return True
 
-    def correct(self):
+    def __correct(self):
         if self.check_edges():
             if self.check_neighbours():
                 return True

@@ -3,8 +3,8 @@ class City:
         self.rows = data[0]
         self.columns = data[2]
         self.distance = data[4]
-
-        self.possible_building = []
+        self.possible_residentials = []
+        self.possible_utilities = []
 
     def build(self):
         pass
