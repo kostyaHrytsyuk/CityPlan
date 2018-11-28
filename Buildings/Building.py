@@ -25,7 +25,7 @@ class Building:
             self.structure.append(structure[len(structure) - 1])
 
     def draw(self):
-        print('-----------------')
+        #print('-----------------')
         for i in self.structure:
             print(i)
 

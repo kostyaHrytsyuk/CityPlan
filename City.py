@@ -9,11 +9,12 @@ class City:
         self.residentials = []
         self.utilities = []
         sorted_information = City.__make_city(self, data)
-        self.rows = int(sorted_information[0][0])
-        self.columns = int(sorted_information[0][2])
-        self.distance = int(sorted_information[0][4])
+        city_info = str(sorted_information[0]).split()
+        self.rows = int(city_info[0])
+        self.columns = int(city_info[1])
+        self.distance = int(city_info[2])
         self.possible_residentials = City.sort_buildings(self.possible_residentials)
-        self.possible_utilities = City.sort_buildings(self.possible_utilities)
+        # self.possible_utilities = City.sort_buildings(self.possible_utilities)
 
     def build(self):
         pass
@@ -31,10 +32,8 @@ class City:
             project_counter = 0
 
             for index_element in range(1, len(data)):
-                item = data[index_element]
                 if data[index_element][0] == 'R' or data[index_element][0] == 'U':
                     length = data[index_element][2]
-                    # build_info.append([data[index_element, project_counter])
                     build_info.append([data[index_element], project_counter])
                     project_counter += 1
                     temporary_lst = data[int(index_element + 1):int(index_element) + 1 + int(length)]
@@ -52,18 +51,17 @@ class City:
 
             if info_about_building[0][0] == 'R':
                 new_build = Residential(info_about_building, construction)
-                if new_build.correct:
-                    self.possible_residentials.append(new_build)
+                self.possible_residentials.append(new_build)
             else:
                 new_build = Utility(info_about_building, construction)
-                if new_build.correct:
-                    self.possible_utilities.append(new_build)
+                self.possible_utilities.append(new_build)
 
         return result
 
     @staticmethod
     def sort_buildings(buildings):
-        return sorted(buildings, key=lambda a: a.size )
+        return sorted(buildings, key=lambda a: a.capacity)
+        # return sorted(buildings, key=lambda a: (a.size, a.capacity))
 
     def get_score(self):
         score = 0
