@@ -4,13 +4,16 @@ from ManhattanHelper import *
 
 class Building:
     def __init__(self, general_information, structure):
-        self.type = general_information[0]
-        self.rows = int(general_information[2])
-        self.columns = int(general_information[4])
+        self.type = general_information[0][0]
+        self.rows = int(general_information[0][2])
+        self.columns = int(general_information[0][4])
         self.structure = []
+        self.left_top_corner = [0, 0]
+        self.project_number = general_information[1]
         self.save_structure(structure)
         self.coordinates = self.mathematical()
         self.correct = self.__correct()
+        self.size = self.get_building_size()
 
     def save_structure(self, structure):
         for i in range(len(structure)-1):
