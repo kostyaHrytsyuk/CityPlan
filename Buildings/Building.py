@@ -1,4 +1,4 @@
-from Coordinates import *
+from Coordinate.Coordinates import *
 from ManhattanHelper import *
 
 

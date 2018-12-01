@@ -11,7 +11,7 @@ if __name__ == '__main__':
     information = read_input_file("b_short_walk.in")
 
     new_city = City(information)
-
+    new_city.build()
     for i in new_city.possible_utilities:
         print("----Utility {}----".format(i.project_number))
         i.draw()

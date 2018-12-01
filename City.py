@@ -1,3 +1,4 @@
+from Coordinate.CityCoordinate import CityCoordinate
 from Buildings.Residential import *
 from Buildings.Utility import *
 
@@ -17,7 +18,13 @@ class City:
         # self.possible_utilities = City.sort_buildings(self.possible_utilities)
 
     def build(self):
-        pass
+        city = []
+        for i in range(self.rows):
+            city.append([])
+            for j in range(self.columns):
+                point = CityCoordinate(i, j, 0, None)
+                city[i].append(point)
+        print()
 
     def set_info(self, columns):
         self.columns = columns
