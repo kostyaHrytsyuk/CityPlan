@@ -5,7 +5,8 @@ class Residential(Building):
 
     def __init__(self, general_information, structure):
         super().__init__(general_information, structure)
-        self.capacity = general_information[0][6]
+        self.capacity = int(general_information[0][6])
+        self.profit = self.capacity/self.size
         self.utilities_around = []
 
     def is_utility_around(self, utility):

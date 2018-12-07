@@ -15,16 +15,57 @@ class City:
         self.columns = int(city_info[1])
         self.distance = int(city_info[2])
         self.possible_residentials = City.sort_buildings(self.possible_residentials)
-        # self.possible_utilities = City.sort_buildings(self.possible_utilities)
+        self.possible_utilities = City.sort_buildings(self.possible_utilities)
+        self.city = []
 
     def build(self):
-        city = []
         for i in range(self.rows):
-            city.append([])
+            self.city.append([])
             for j in range(self.columns):
                 point = CityCoordinate(i, j, 0, None)
-                city[i].append(point)
+                self.city[i].append(point)
+
+        found = False
+        counter = 0
+        first_building = None
+        while not found:
+            if self.possible_residentials[counter].size > self.distance:
+                first_building = self.possible_residentials[counter]
+                found = True
+            counter += 1
+
+        self.__make_square(first_building, [0, 0])
+
+
         print()
+
+    def __check_building_possibility(self, building, row, column):
+        for i in range(row, row + building.rows):
+            if i >= self.rows:
+                return False
+            else:
+                for j in range(column, column + building.columns):
+                    if j >= self.columns:
+                        return False
+                    else:
+                        if self.city[i][j].content == '#':
+                            return False
+        return True
+
+    def __make_square(self, residential, top_left_corner):
+        row = top_left_corner[0]
+        column = top_left_corner[1]
+        counter = 0
+
+        while row < self.rows or counter < 3:
+            column = top_left_corner[1]
+            for _ in range(3):
+                if column < self.columns:
+                    if self.__check_building_possibility(residential, row, column):
+                        column += residential.columns
+                        # build residential
+
+        pass
 
     def set_info(self, columns):
         self.columns = columns
@@ -67,7 +108,10 @@ class City:
 
     @staticmethod
     def sort_buildings(buildings):
-        return sorted(buildings, key=lambda a: a.capacity)
+        if buildings[0].type == 'R':
+            return sorted(buildings, key=lambda a: a.profit, reverse=True)
+        else:
+            return sorted(buildings, key=lambda a: a.service_type, reverse=True)
         # return sorted(buildings, key=lambda a: (a.size, a.capacity))
 
     def get_score(self):

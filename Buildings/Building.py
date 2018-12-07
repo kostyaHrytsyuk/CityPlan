@@ -99,5 +99,8 @@ class Building:
     def get_building_size(self):
         a = self.coordinates[0].point
         b = self.coordinates[-1].point
-        size = ManhattanHelper.manhattan_distance(a, b)
+        if a == b == [0, 0]:
+            size = 1
+        else:
+            size = ManhattanHelper.manhattan_distance(a, b)
         return size
