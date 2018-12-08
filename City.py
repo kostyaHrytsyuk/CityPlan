@@ -1,6 +1,7 @@
 from Coordinate.CityCoordinate import CityCoordinate
 from Buildings.Residential import *
 from Buildings.Utility import *
+import copy
 
 
 class City:
@@ -28,15 +29,15 @@ class City:
         found = False
         counter = 0
         first_building = None
-        while not found:
+        while not found and counter < len(self.possible_residentials):
             if self.possible_residentials[counter].size > self.distance:
                 first_building = self.possible_residentials[counter]
                 found = True
             counter += 1
+        if not found:
+            first_building = self.possible_residentials[0]
 
         self.__make_square(first_building, [0, 0])
-
-
         print()
 
     def __check_building_possibility(self, building, row, column):
@@ -54,17 +55,39 @@ class City:
 
     def __make_square(self, residential, top_left_corner):
         row = top_left_corner[0]
-        column = top_left_corner[1]
         counter = 0
 
-        while row < self.rows or counter < 3:
+        while row < self.rows and counter < 3:
             column = top_left_corner[1]
             for _ in range(3):
                 if column < self.columns:
                     if self.__check_building_possibility(residential, row, column):
-                        column += residential.columns
-                        # build residential
+                        if counter == 1 and _ == 1:
+                            column += residential.columns * 2
+                        else:
+                            self.__build_house(residential, [row, column])
+                            column += residential.columns
+            row += residential.rows
+            counter += 1
 
+        print()
+
+    def __build_house(self, house, top_left_corner):
+        project = copy.deepcopy(house)
+        project.left_top_corner = top_left_corner
+        project.coordinates = project.mathematical()
+        for i in range(project.rows):
+            for coordinate in project.coordinates[i]:
+                coordinate.build_type = project.type
+                coordinate.project_number = project.project_number
+                self.city[coordinate.point[0]][coordinate.point[1]] = coordinate
+
+        if project.type == 'R':
+            self.residentials.append(project)
+        else:
+            self.utilities.append(project)
+
+    def look_around(self, project):
         pass
 
     def set_info(self, columns):

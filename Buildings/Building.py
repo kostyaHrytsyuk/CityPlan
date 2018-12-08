@@ -3,12 +3,14 @@ from ManhattanHelper import *
 
 
 class Building:
-    def __init__(self, general_information, structure):
+    def __init__(self, general_information, structure, left_top_corner=None):
+        if left_top_corner is None:
+            left_top_corner = [0, 0]
         self.type = general_information[0][0]
         self.rows = int(general_information[0][2])
         self.columns = int(general_information[0][4])
         self.structure = []
-        self.left_top_corner = [0, 0]
+        self.left_top_corner = left_top_corner
         self.project_number = general_information[1]
         self.save_structure(structure)
         self.coordinates = self.mathematical()
@@ -25,26 +27,32 @@ class Building:
             self.structure.append(structure[len(structure) - 1])
 
     def draw(self):
-        #print('-----------------')
         for i in self.structure:
             print(i)
 
     def mathematical(self):
-        str_structure = ''
-        for i in self.structure:
-            str_structure += i
+        bld_model = []
+        counter = 0
+        for i in range(self.left_top_corner[0], self.left_top_corner[0] + len(self.structure)):
+            bld_model.append([])
+            for j in range(self.left_top_corner[1], self.left_top_corner[1] + len(self.structure[0])):
+                bld_model[counter].append([i, j])
+            counter += 1
 
-        raw_coordinates = [[i, j] for i in range(len(self.structure)) for j in range(len(self.structure[0]))]
-
-        for i in range(len(str_structure)):
-            if str_structure[i] == '.':
-                raw_coordinates[i].append(str_structure[i])
-            elif str_structure[i] == '#':
-                raw_coordinates[i].append(str_structure[i])
+        for i in range(len(self.structure)):
+            j = 0
+            for char in self.structure[i]:
+                if char == '.':
+                    bld_model[i][j].append(char)
+                elif char == '#':
+                    bld_model[i][j].append(char)
+                j += 1
 
         coordinates = []
-        for p in raw_coordinates:
-            coordinates.append(Coordinates(p[0], p[1], p[2]))
+        for row in range(len(bld_model)):
+            coordinates.append([])
+            for q in range(len(bld_model[row])):
+                coordinates[row].append(Coordinates(bld_model[row][q][0], bld_model[row][q][1], bld_model[row][q][2]))
 
         return coordinates
 
@@ -97,8 +105,8 @@ class Building:
         return False
 
     def get_building_size(self):
-        a = self.coordinates[0].point
-        b = self.coordinates[-1].point
+        a = self.coordinates[0][0].point
+        b = self.coordinates[-1][-1].point
         if a == b == [0, 0]:
             size = 1
         else:
