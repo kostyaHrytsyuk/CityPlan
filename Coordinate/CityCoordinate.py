@@ -6,3 +6,4 @@ class CityCoordinate(Coordinates):
         super().__init__(x, y, content)
         self.build_type = build_type
         self.project_number = project_number
+        self.id = None

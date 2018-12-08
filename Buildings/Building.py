@@ -15,6 +15,7 @@ class Building:
         self.save_structure(structure)
         self.coordinates = self.mathematical()
         self.size = self.get_building_size()
+        self.id = None
 
     def save_structure(self, structure):
         for i in range(len(structure)-1):

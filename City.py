@@ -18,6 +18,7 @@ class City:
         self.possible_residentials = City.sort_buildings(self.possible_residentials)
         self.possible_utilities = City.sort_buildings(self.possible_utilities)
         self.city = []
+        self.curr_proj_id = 0
 
     def build(self):
         for i in range(self.rows):
@@ -76,18 +77,22 @@ class City:
         project = copy.deepcopy(house)
         project.left_top_corner = top_left_corner
         project.coordinates = project.mathematical()
+        project.id = self.curr_proj_id
+        self.curr_proj_id += 1
+
         for i in range(project.rows):
             for coordinate in project.coordinates[i]:
+                coordinate.id = project.id
                 coordinate.build_type = project.type
                 coordinate.project_number = project.project_number
                 self.city[coordinate.point[0]][coordinate.point[1]] = coordinate
 
         if project.type == 'R':
             self.look_around(project)
-            # self.residentials.update({project.id: project})
+            self.residentials.update({project.id: project})
         else:
             self.look_around(project)
-            # self.utilities.update({project.id: project})
+            self.utilities.update({project.id: project})
 
     def look_around(self, project):
         edge1_lst = project.coordinates[0]
