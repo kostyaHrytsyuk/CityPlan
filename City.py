@@ -108,7 +108,6 @@ class City:
             for point in edge:
                 if point.content == '#':
                     self.find_buildings(point, project)
-        pass
 
     def find_buildings(self, coordinate, project):
         cur_point = coordinate.point
@@ -117,11 +116,12 @@ class City:
             spot = self.city[cur_point[0]][cur_point[1]]
             if spot.build_type:
                 if coordinate.build_type != spot.build_type:
-                    if coordinate.content == 'R' and project.is_utility_around(spot.service_type):
+                    if coordinate.content == 'R' and not project.is_utility_around(spot.service_type):
                         project.utilities_around.append(spot.service_type)
                     elif coordinate.content == 'U':
-                        pass
-            pass
+                        neighbour = self.residentials[coordinate.id]
+                        if not neighbour.is_utility_around(project.service_type):
+                            neighbour.utilities_around.append(project)
 
     def set_info(self, columns):
         self.columns = columns
