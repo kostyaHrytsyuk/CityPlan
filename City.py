@@ -116,7 +116,8 @@ class City:
 
         for build in range(len(new[0])):
 
-            info_about_building = new[0][build]
+            # info_about_building = new[0][build]
+            info_about_building = new[0][build][0].split() + [new[0][build][1]]
 
             construction = new[1][build]
 

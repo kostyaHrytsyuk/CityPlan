@@ -6,15 +6,14 @@ class Building:
     def __init__(self, general_information, structure, left_top_corner=None):
         if left_top_corner is None:
             left_top_corner = [0, 0]
-        self.type = general_information[0][0]
-        self.rows = int(general_information[0][2])
-        self.columns = int(general_information[0][4])
+        self.type = general_information[0]
+        self.rows = int(general_information[1])
+        self.columns = int(general_information[2])
         self.structure = []
         self.left_top_corner = left_top_corner
-        self.project_number = general_information[1]
+        self.project_number = general_information[4]
         self.save_structure(structure)
         self.coordinates = self.mathematical()
-        self.correct = self.__correct()
         self.size = self.get_building_size()
 
     def save_structure(self, structure):
