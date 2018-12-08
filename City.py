@@ -8,8 +8,8 @@ class City:
     def __init__(self, data):
         self.possible_residentials = []
         self.possible_utilities = []
-        self.residentials = []
-        self.utilities = []
+        self.residentials = {}
+        self.utilities = {}
         sorted_information = City.__make_city(self, data)
         city_info = str(sorted_information[0]).split()
         self.rows = int(city_info[0])
@@ -83,12 +83,40 @@ class City:
                 self.city[coordinate.point[0]][coordinate.point[1]] = coordinate
 
         if project.type == 'R':
-            self.residentials.append(project)
+            self.look_around(project)
+            # self.residentials.update({project.id: project})
         else:
-            self.utilities.append(project)
+            self.look_around(project)
+            # self.utilities.update({project.id: project})
 
     def look_around(self, project):
+        edge1_lst = project.coordinates[0]
+        edge2_lst = []
+        edge3_lst = []
+        for i in range(len(project.coordinates)):
+            edge2_lst.append(project.coordinates[i][0])
+            edge3_lst.append(project.coordinates[i][project.columns - 1])
+        edge4_lst = project.coordinates[project.rows - 1]
+        edges = [edge1_lst, edge2_lst, edge3_lst, edge4_lst]
+
+        for edge in edges:
+            for point in edge:
+                if point.content == '#':
+                    self.find_buildings(point, project)
         pass
+
+    def find_buildings(self, coordinate, project):
+        cur_point = coordinate.point
+        cur_point[0] -= self.distance
+        while cur_point[0] != coordinate.point[0] and cur_point[1] < self.columns:
+            spot = self.city[cur_point[0]][cur_point[1]]
+            if spot.build_type:
+                if coordinate.build_type != spot.build_type:
+                    if coordinate.content == 'R' and project.is_utility_around(spot.service_type):
+                        project.utilities_around.append(spot.service_type)
+                    elif coordinate.content == 'U':
+                        pass
+            pass
 
     def set_info(self, columns):
         self.columns = columns

@@ -9,8 +9,8 @@ class Residential(Building):
         self.profit = self.capacity/self.size
         self.utilities_around = []
 
-    def is_utility_around(self, utility):
+    def is_utility_around(self, utility_type):
         for u in self.utilities_around:
-            if utility.service_type == u.service_type:
+            if utility_type == u.service_type:
                 return True
         return False
