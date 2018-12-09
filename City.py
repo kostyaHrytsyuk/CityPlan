@@ -26,7 +26,7 @@ class City:
         for i in range(self.rows):
             self.city.append([])
             for j in range(self.columns):
-                point = CityCoordinate(i, j, '.', None)
+                point = CityCoordinate(i, j, 0, None)
                 self.city[i].append(point)
 
         found = False
@@ -72,22 +72,26 @@ class City:
                             column += residential.columns
             row += residential.rows
             counter += 1
-
+        top_left_corner[0] = residential.rows
+        top_left_corner[1] = residential.columns
+        self.__fill_square_with_utilities(top_left_corner)
         print()
 
     def __fill_square_with_utilities(self, top_left_corner):
         best_utility = self.__find_best_utility(top_left_corner)
+        self.__build_house(best_utility, top_left_corner)
         pass
 
     def __find_best_utility(self, top_left_corner):
-        neighbour_point = self.city[top_left_corner[0]][top_left_corner[1]]
+        neighbour_point = self.city[top_left_corner[0]-1][top_left_corner[1]-1]
         neighbour = self.residentials[neighbour_point.id]
-        u = 0
-        best_utility = self.possible_utilities[u]
-        while not neighbour.is_utility_around(self.possible_utilities[u]):
+        u = list(self.possible_utilities.keys())[0]
+        while u <= len(self.possible_utilities.keys()):
+            if not neighbour.is_utility_around(u):
+                for utility in self.possible_utilities[u]:
+                    if self.__check_building_possibility(utility, top_left_corner[0], top_left_corner[1]):
+                        return utility
             u += 1
-
-        return []
 
     def __build_house(self, house, top_left_corner):
         project = copy.deepcopy(house)
@@ -152,11 +156,11 @@ class City:
                 for column in range(cur_step):
                     if cur_point[1] < self.columns:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
-                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
+                            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coord.content == 'U':
-                                neighbour = self.residentials[coord.id]
+                            elif coord.build_type == 'U':
+                                neighbour = self.residentials[spot.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[1] += 1
@@ -173,11 +177,11 @@ class City:
                 for row in range(cur_step):
                     if cur_point[0] < self.rows:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
-                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
+                            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coord.content == 'U':
-                                neighbour = self.residentials[coord.id]
+                            elif coord.build_type == 'U':
+                                neighbour = self.residentials[spot.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[0] += 1
@@ -194,11 +198,11 @@ class City:
                 for column in range(cur_step):
                     if cur_point[1] >= 0:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
                             if coord.content == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
                             elif coord.content == 'U':
-                                neighbour = self.residentials[coord.id]
+                                neighbour = self.residentials[spot.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[1] -= 1
@@ -213,13 +217,13 @@ class City:
         while cur_point[1] != coord.point[1]:
             if cur_point[1] >= 0:
                 for rows in range(cur_step):
-                    if cur_point[0] <= 0:
+                    if cur_point[0] >= 0:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
-                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
+                            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coord.content == 'U':
-                                neighbour = self.residentials[coord.id]
+                            elif coord.build_type == 'U':
+                                neighbour = self.residentials[spot.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[0] += 1
