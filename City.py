@@ -66,7 +66,7 @@ class City:
                 if column < self.columns:
                     if self.__check_building_possibility(residential, row, column):
                         if counter == 1 and _ == 1:
-                            column += residential.columns * 2
+                            column += residential.columns
                         else:
                             self.__build_house(residential, [row, column])
                             column += residential.columns
@@ -74,16 +74,23 @@ class City:
             counter += 1
         top_left_corner[0] = residential.rows
         top_left_corner[1] = residential.columns
-        self.__fill_square_with_utilities(top_left_corner)
+        self.__fill_square_with_utilities(top_left_corner, residential)
         print()
 
-    def __fill_square_with_utilities(self, top_left_corner):
-        best_utility = self.__find_best_utility(top_left_corner)
-        self.__build_house(best_utility, top_left_corner)
-        pass
+    def __fill_square_with_utilities(self, top_left_corner, square_element):
+        cur_point = top_left_corner[:]
+        for row in range(top_left_corner[0], (top_left_corner[0] + square_element.rows)):
+            cur_point[1] = top_left_corner[1]
+            for column in range(top_left_corner[1], (top_left_corner[1] + square_element.columns)):
+                if self.city[row][column].content != '#':
+                    best_utility = self.__find_best_utility([row, column])
+                    if best_utility:
+                        self.__build_house(best_utility, [row, column])
 
     def __find_best_utility(self, top_left_corner):
-        neighbour_point = self.city[top_left_corner[0]-1][top_left_corner[1]-1]
+        # TODO: Rewrite neighbour search
+        # neighbour = self.look_around()
+        neighbour_point = self.city[top_left_corner[0] - 1][top_left_corner[1] - 1]
         neighbour = self.residentials[neighbour_point.id]
         u = list(self.possible_utilities.keys())[0]
         while u <= len(self.possible_utilities.keys()):
@@ -92,6 +99,8 @@ class City:
                     if self.__check_building_possibility(utility, top_left_corner[0], top_left_corner[1]):
                         return utility
             u += 1
+        else:
+            return None
 
     def __build_house(self, house, top_left_corner):
         project = copy.deepcopy(house)
@@ -114,7 +123,7 @@ class City:
             self.look_around(project)
             self.utilities.update({project.id: project})
 
-    def look_around(self, project):
+    def look_around(self, project, return_value=False):
         edge_up = project.coordinates[0]
         edge_right = []
         edge_left = []
@@ -125,29 +134,58 @@ class City:
 
         for point in edge_up:
             if point.content == '#':
-                self.look_left(point, project)
-                self.look_up(point, project)
-                self.look_right(point, project)
+                if not return_value:
+                    self.look_left(point, project)
+                    self.look_up(point, project)
+                    self.look_right(point, project)
+                else:
+                    res = self.look_left(point, project, return_value)
+                    if res:
+                        return res
+                    res = self.look_up(point, project, return_value)
+                    if res:
+                        return res
+                    res = self.look_right(point, project, return_value)
+                    if res:
+                        return res
 
         for point in edge_right:
             if point.content == '#':
-                self.look_up(point, project)
-                self.look_right(point, project)
-                self.look_down(point, project)
+                if not return_value:
+                    self.look_right(point, project)
+                    self.look_down(point, project)
+                else:
+                    res = self.look_right(point, project, return_value)
+                    if res:
+                        return res
+                    res = self.look_down(point, project, return_value)
+                    if res:
+                        return res
 
         for point in edge_down:
             if point.content == '#':
-                self.look_right(point, project)
-                self.look_down(point, project)
-                self.look_left(point, project)
+                if not return_value:
+                    self.look_down(point, project)
+                    self.look_left(point, project)
+                else:
+                    res = self.look_down(point, project, return_value)
+                    if res:
+                        return res
+                    res = self.look_left(point, project, return_value)
+                    if res:
+                        return res
 
         for point in edge_left:
             if point.content == '#':
-                self.look_down(point, project)
-                self.look_left(point, project)
-                self.look_up(point, project)
+                if not return_value:
+                    self.look_left(point, project)
+                else:
+                    res = self.look_left(point, project, return_value)
+                    if res:
+                        return res
 
-    def look_up(self, coord, project):
+    def look_up(self, coord, project, return_value=False):
+        res = None
         cur_point = coord.point[:]
         cur_point[0] -= self.distance
         cur_step = ((coord.point[0] - cur_point[0]) - self.distance) + 1
@@ -155,20 +193,15 @@ class City:
             if 0 <= cur_point[0]:
                 for column in range(cur_step):
                     if cur_point[1] < self.columns:
-                        spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
-                            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
-                                project.utilities_around.append(spot.service_type)
-                            elif coord.build_type == 'U':
-                                neighbour = self.residentials[spot.id]
-                                if not neighbour.is_utility_around(project.service_type):
-                                    neighbour.utilities_around.append(project)
+                        res = self.check_builds_around(coord, cur_point, project, res, return_value)
                         cur_point[1] += 1
             cur_point[1] = coord.point[1]
             cur_point[0] += 1
             cur_step += 1
+        return res
 
-    def look_right(self, coord, project):
+    def look_right(self, coord, project, return_value=False):
+        res = None
         cur_point = coord.point[:]
         cur_point[1] += self.distance
         cur_step = ((cur_point[1] - coord.point[1]) - self.distance) + 1
@@ -176,20 +209,15 @@ class City:
             if cur_point[1] < self.columns:
                 for row in range(cur_step):
                     if cur_point[0] < self.rows:
-                        spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
-                            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
-                                project.utilities_around.append(spot.service_type)
-                            elif coord.build_type == 'U':
-                                neighbour = self.residentials[spot.id]
-                                if not neighbour.is_utility_around(project.service_type):
-                                    neighbour.utilities_around.append(project)
+                        res = self.check_builds_around(coord, cur_point, project, res, return_value)
                         cur_point[0] += 1
             cur_point[0] = coord.point[0]
             cur_point[1] -= 1
             cur_step += 1
+        return res
 
-    def look_down(self, coord, project):
+    def look_down(self, coord, project, return_value=False):
+        res = None
         cur_point = coord.point[:]
         cur_point[0] += self.distance
         cur_step = ((cur_point[0] - coord.point[0]) - self.distance) + 1
@@ -197,20 +225,15 @@ class City:
             if cur_point[0] < self.rows:
                 for column in range(cur_step):
                     if cur_point[1] >= 0:
-                        spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
-                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
-                                project.utilities_around.append(spot.service_type)
-                            elif coord.content == 'U':
-                                neighbour = self.residentials[spot.id]
-                                if not neighbour.is_utility_around(project.service_type):
-                                    neighbour.utilities_around.append(project)
+                        res = self.check_builds_around(coord, cur_point, project, res, return_value)
                         cur_point[1] -= 1
             cur_point[1] = coord.point[1]
             cur_point[0] -= 1
             cur_step += 1
+        return res
 
-    def look_left(self, coord, project):
+    def look_left(self, coord, project, return_value=False):
+        res = None
         cur_point = coord.point[:]
         cur_point[1] -= self.distance
         cur_step = ((coord.point[1] - cur_point[1]) - self.distance) + 1
@@ -218,18 +241,26 @@ class City:
             if cur_point[1] >= 0:
                 for rows in range(cur_step):
                     if cur_point[0] >= 0:
-                        spot = self.city[cur_point[0]][cur_point[1]]
-                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
-                            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
-                                project.utilities_around.append(spot.service_type)
-                            elif coord.build_type == 'U':
-                                neighbour = self.residentials[spot.id]
-                                if not neighbour.is_utility_around(project.service_type):
-                                    neighbour.utilities_around.append(project)
+                        res = self.check_builds_around(coord, cur_point, project, res, return_value)
                         cur_point[0] += 1
             cur_point[0] = coord.point[0]
             cur_point[1] += 1
             cur_step += 1
+        return res
+
+    def check_builds_around(self, coord, cur_point, project, res, return_value):
+        spot = self.city[cur_point[0]][cur_point[1]]
+        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
+            if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
+                project.utilities_around.append(spot.service_type)
+            elif coord.build_type == 'U':
+                neighbour = self.residentials[spot.id]
+                if not neighbour.is_utility_around(project.service_type):
+                    if not return_value:
+                        neighbour.utilities_around.append(project)
+                    else:
+                        res = neighbour
+        return res
 
     def set_info(self, columns):
         self.columns = columns
