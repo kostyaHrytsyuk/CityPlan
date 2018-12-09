@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from Coordinate.CityCoordinate import CityCoordinate
 from Buildings.Residential import *
 from Buildings.Utility import *
@@ -15,7 +17,7 @@ class City:
         self.rows = int(city_info[0])
         self.columns = int(city_info[1])
         self.distance = int(city_info[2])
-        self.possible_residentials = City.sort_buildings(self.possible_residentials)
+        self.possible_residentials = sorted(self.possible_residentials, key=lambda a: a.profit, reverse=True)
         self.possible_utilities = City.sort_buildings(self.possible_utilities)
         self.city = []
         self.curr_proj_id = 0
@@ -72,6 +74,20 @@ class City:
             counter += 1
 
         print()
+
+    def __fill_square_with_utilities(self, top_left_corner):
+        best_utility = self.__find_best_utility(top_left_corner)
+        pass
+
+    def __find_best_utility(self, top_left_corner):
+        neighbour_point = self.city[top_left_corner[0]][top_left_corner[1]]
+        neighbour = self.residentials[neighbour_point.id]
+        u = 0
+        best_utility = self.possible_utilities[u]
+        while not neighbour.is_utility_around(self.possible_utilities[u]):
+            u += 1
+
+        return []
 
     def __build_house(self, house, top_left_corner):
         project = copy.deepcopy(house)
@@ -252,12 +268,18 @@ class City:
         return result
 
     @staticmethod
-    def sort_buildings(buildings):
-        if buildings[0].type == 'R':
-            return sorted(buildings, key=lambda a: a.profit, reverse=True)
-        else:
-            return sorted(buildings, key=lambda a: a.service_type, reverse=True)
-        # return sorted(buildings, key=lambda a: (a.size, a.capacity))
+    def sort_buildings(utilities):
+        res = {}
+        for utility in utilities:
+            if utility.service_type not in res:
+                res.update({utility.service_type: [utility]})
+            else:
+                res[utility.service_type].append(utility)
+        res = OrderedDict(sorted(res.items(), key=lambda t: t[0]))
+        for service_type in res:
+            items = res[service_type]
+            res[service_type] = sorted(items, key=lambda u: u.size)
+        return res
 
     def get_score(self):
         score = 0
