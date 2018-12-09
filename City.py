@@ -24,7 +24,7 @@ class City:
         for i in range(self.rows):
             self.city.append([])
             for j in range(self.columns):
-                point = CityCoordinate(i, j, 0, None)
+                point = CityCoordinate(i, j, '.', None)
                 self.city[i].append(point)
 
         found = False
@@ -95,105 +95,120 @@ class City:
             self.utilities.update({project.id: project})
 
     def look_around(self, project):
-        edge1_lst = project.coordinates[0]
-        edge2_lst = []
-        edge3_lst = []
+        edge_up = project.coordinates[0]
+        edge_right = []
+        edge_left = []
         for i in range(len(project.coordinates)):
-            edge2_lst.append(project.coordinates[i][0])
-            edge3_lst.append(project.coordinates[i][project.columns - 1])
-        edge4_lst = project.coordinates[project.rows - 1]
-        edges = [edge1_lst, edge2_lst, edge3_lst, edge4_lst]
+            edge_left.append(project.coordinates[i][0])
+            edge_right.append(project.coordinates[i][project.columns - 1])
+        edge_down = project.coordinates[project.rows - 1]
 
-        for edge in edges:
-            for point in edge:
-                if point.content == '#':
-                    self.find_buildings(point, project)
+        for point in edge_up:
+            if point.content == '#':
+                self.look_left(point, project)
+                self.look_up(point, project)
+                self.look_right(point, project)
 
-    def find_buildings(self, coordinate, project):
-        self.look_up(coordinate, project)
+        for point in edge_right:
+            if point.content == '#':
+                self.look_up(point, project)
+                self.look_right(point, project)
+                self.look_down(point, project)
 
-    def look_up(self, coordinate, project):
-        cur_point = coordinate.point
+        for point in edge_down:
+            if point.content == '#':
+                self.look_right(point, project)
+                self.look_down(point, project)
+                self.look_left(point, project)
+
+        for point in edge_left:
+            if point.content == '#':
+                self.look_down(point, project)
+                self.look_left(point, project)
+                self.look_up(point, project)
+
+    def look_up(self, coord, project):
+        cur_point = coord.point[:]
         cur_point[0] -= self.distance
-        cur_step = ((coordinate.point[0] - cur_point[0]) - self.distance) + 1
-        while cur_point[0] != coordinate.point[0]:
+        cur_step = ((coord.point[0] - cur_point[0]) - self.distance) + 1
+        while cur_point[0] != coord.point[0]:
             if 0 <= cur_point[0]:
                 for column in range(cur_step):
-                    if column < self.columns:
+                    if cur_point[1] < self.columns:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coordinate.build_type != spot.build_type and coordinate.id != spot.id:
-                            if coordinate.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
+                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coordinate.content == 'U':
-                                neighbour = self.residentials[coordinate.id]
+                            elif coord.content == 'U':
+                                neighbour = self.residentials[coord.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[1] += 1
-            cur_point[1] = coordinate.point[1]
+            cur_point[1] = coord.point[1]
             cur_point[0] += 1
             cur_step += 1
 
-    def look_right(self, coordinate, project):
-        cur_point = coordinate.point
+    def look_right(self, coord, project):
+        cur_point = coord.point[:]
         cur_point[1] += self.distance
-        cur_step = ((coordinate.point[1] - cur_point[1]) - self.distance) + 1
-        while cur_point[1] != coordinate.point[1]:
+        cur_step = ((cur_point[1] - coord.point[1]) - self.distance) + 1
+        while cur_point[1] != coord.point[1]:
             if cur_point[1] < self.columns:
                 for row in range(cur_step):
-                    if row < self.rows:
+                    if cur_point[0] < self.rows:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coordinate.build_type != spot.build_type and coordinate.id != spot.id:
-                            if coordinate.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
+                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coordinate.content == 'U':
-                                neighbour = self.residentials[coordinate.id]
+                            elif coord.content == 'U':
+                                neighbour = self.residentials[coord.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[0] += 1
-            cur_point[0] = coordinate.point[0]
+            cur_point[0] = coord.point[0]
             cur_point[1] -= 1
             cur_step += 1
 
-    def look_down(self, coordinate, project):
-        cur_point = coordinate.point
+    def look_down(self, coord, project):
+        cur_point = coord.point[:]
         cur_point[0] += self.distance
-        cur_step = ((cur_point[0] - coordinate.point[0]) - self.distance) + 1
-        while cur_point[0] != coordinate.point[0]:
+        cur_step = ((cur_point[0] - coord.point[0]) - self.distance) + 1
+        while cur_point[0] != coord.point[0]:
             if cur_point[0] < self.rows:
                 for column in range(cur_step):
-                    if column > 0:
+                    if cur_point[1] >= 0:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coordinate.build_type != spot.build_type and coordinate.id != spot.id:
-                            if coordinate.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
+                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coordinate.content == 'U':
-                                neighbour = self.residentials[coordinate.id]
+                            elif coord.content == 'U':
+                                neighbour = self.residentials[coord.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[1] -= 1
-            cur_point[1] = coordinate.point[1]
+            cur_point[1] = coord.point[1]
             cur_point[0] -= 1
             cur_step += 1
 
-    def look_left(self, coordinate, project):
-        cur_point = coordinate.point
+    def look_left(self, coord, project):
+        cur_point = coord.point[:]
         cur_point[1] -= self.distance
-        cur_step = ((coordinate.point[1] - cur_point[1]) - self.distance) + 1
-        while cur_point[1] != coordinate.point[1]:
+        cur_step = ((coord.point[1] - cur_point[1]) - self.distance) + 1
+        while cur_point[1] != coord.point[1]:
             if cur_point[1] >= 0:
                 for rows in range(cur_step):
-                    if rows <= 0:
+                    if cur_point[0] <= 0:
                         spot = self.city[cur_point[0]][cur_point[1]]
-                        if coordinate.build_type != spot.build_type and coordinate.id != spot.id:
-                            if coordinate.content == 'R' and not project.is_utility_around(spot.service_type):
+                        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != '.':
+                            if coord.content == 'R' and not project.is_utility_around(spot.service_type):
                                 project.utilities_around.append(spot.service_type)
-                            elif coordinate.content == 'U':
-                                neighbour = self.residentials[coordinate.id]
+                            elif coord.content == 'U':
+                                neighbour = self.residentials[coord.id]
                                 if not neighbour.is_utility_around(project.service_type):
                                     neighbour.utilities_around.append(project)
                         cur_point[0] += 1
-            cur_point[0] = coordinate.point[0]
-            cur_point[1] -= 1
+            cur_point[0] = coord.point[0]
+            cur_point[1] += 1
             cur_step += 1
 
     def set_info(self, columns):

@@ -8,7 +8,7 @@ def read_input_file(file):
 
 
 if __name__ == '__main__':
-    information = read_input_file("a_example.in")
+    information = read_input_file("b_short_walk.in")
 
     new_city = City(information)
     new_city.build()
