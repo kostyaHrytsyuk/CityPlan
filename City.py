@@ -2,7 +2,6 @@ from Buildings.Residential import *
 from Buildings.Utility import *
 from collections import OrderedDict
 from Coordinate.CityCoordinateUtility import CityCoordinateUtility
-import copy
 
 
 def null_coordinate(coordinate):
@@ -113,7 +112,6 @@ class City:
                             self.__build_house(best_utility, [row, column])
 
     def __find_best_utility(self, top_left_corner):
-        # TODO: Rewrite neighbour search
         self.mock_project.left_top_corner = top_left_corner[:]
         self.mock_project.coordinates = self.mock_project.mathematical('U')
         coordinate = self.mock_project.coordinates[0][0]
@@ -134,11 +132,7 @@ class City:
                 return None
 
     def __build_house(self, house, top_left_corner):
-        # info = [house.type, house.rows, house.columns, house.capacity, house.project_number, house.structure]
-        # project = Residential(house)
         project = house.get_copy(top_left_corner[:])
-        # project.left_top_corner = top_left_corner[:]
-        # project.coordinates = project.mathematical(project.type)
         project.id = self.curr_proj_id
         self.curr_proj_id += 1
 
