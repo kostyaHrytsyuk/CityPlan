@@ -6,6 +6,12 @@ from Buildings.Utility import *
 import copy
 
 
+def null_coordinate(coordinate):
+    coordinate.id = None
+    coordinate.content = 0
+    coordinate.build_type = None
+
+
 class City:
     def __init__(self, data):
         self.possible_residentials = []
@@ -19,6 +25,7 @@ class City:
         self.distance = int(city_info[2])
         self.possible_residentials = sorted(self.possible_residentials, key=lambda a: a.profit, reverse=True)
         self.possible_utilities = City.sort_buildings(self.possible_utilities)
+        self.mock_project = Building(['U', 1, 1, None, -1], '#')
         self.city = []
         self.curr_proj_id = 0
 
@@ -89,22 +96,29 @@ class City:
 
     def __find_best_utility(self, top_left_corner):
         # TODO: Rewrite neighbour search
-        # neighbour = self.look_around()
-        neighbour_point = self.city[top_left_corner[0] - 1][top_left_corner[1] - 1]
-        neighbour = self.residentials[neighbour_point.id]
-        u = list(self.possible_utilities.keys())[0]
-        while u <= len(self.possible_utilities.keys()):
-            if not neighbour.is_utility_around(u):
-                for utility in self.possible_utilities[u]:
-                    if self.__check_building_possibility(utility, top_left_corner[0], top_left_corner[1]):
-                        return utility
-            u += 1
-        else:
-            return None
+        self.mock_project.left_top_corner = top_left_corner[:]
+        self.mock_project.coordinates = self.mock_project.mathematical()
+        self.mock_project.type = 'U'
+        coordinate = self.mock_project.coordinates[0][0]
+        coordinate.build_type = self.mock_project.type
+        coordinate.id = self.mock_project.id
+        self.city[top_left_corner[0]][top_left_corner[1]] = coordinate
+        neighbour = self.look_around(self.mock_project, True)
+        null_coordinate(self.city[top_left_corner[0]][top_left_corner[1]])
+        if neighbour:
+            u = list(self.possible_utilities.keys())[0]
+            while u <= len(self.possible_utilities.keys()):
+                if not neighbour.is_utility_around(u):
+                    for utility in self.possible_utilities[u]:
+                        if self.__check_building_possibility(utility, top_left_corner[0], top_left_corner[1]):
+                            return utility
+                u += 1
+            else:
+                return None
 
     def __build_house(self, house, top_left_corner):
         project = copy.deepcopy(house)
-        project.left_top_corner = top_left_corner
+        project.left_top_corner = top_left_corner[:]
         project.coordinates = project.mathematical()
         project.id = self.curr_proj_id
         self.curr_proj_id += 1
@@ -250,16 +264,16 @@ class City:
 
     def check_builds_around(self, coord, cur_point, project, res, return_value):
         spot = self.city[cur_point[0]][cur_point[1]]
-        if coord.build_type != spot.build_type and coord.id != spot.id and spot.content != 0:
+        if spot.content != 0 and spot.content != '.' and coord.id != spot.id and coord.build_type != spot.build_type:
             if coord.build_type == 'R' and not project.is_utility_around(spot.service_type):
                 project.utilities_around.append(spot.service_type)
             elif coord.build_type == 'U':
                 neighbour = self.residentials[spot.id]
-                if not neighbour.is_utility_around(project.service_type):
-                    if not return_value:
+                if not return_value:
+                    if not neighbour.is_utility_around(project.service_type):
                         neighbour.utilities_around.append(project)
-                    else:
-                        res = neighbour
+                else:
+                    res = neighbour
         return res
 
     def set_info(self, columns):
