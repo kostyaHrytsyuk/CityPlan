@@ -160,72 +160,95 @@ class City:
         for point in edge_up:
             if point.content == '#':
                 if not return_value:
-                    self.look_left(point, project)
-                    self.look_up(point, project)
-                    self.look_right(point, project)
+                    self.look_corner_up_left(point, project)
+                    self.look_corner_up_right(point, project)
+                    self.look_corner_down_right(point, project)
                 else:
-                    res = self.look_left(point, project, return_value)
+                    res = self.look_corner_up_left(point, project, return_value)
                     if res:
                         return res
-                    res = self.look_up(point, project, return_value)
+                    res = self.look_corner_up_right(point, project, return_value)
                     if res:
                         return res
-                    res = self.look_right(point, project, return_value)
+                    res = self.look_corner_down_right(point, project, return_value)
                     if res:
                         return res
 
         for point in edge_right:
             if point.content == '#':
                 if not return_value:
-                    self.look_right(point, project)
-                    self.look_down(point, project)
+                    self.look_corner_down_right(point, project)
+                    self.look_corner_down_left(point, project)
                 else:
-                    res = self.look_right(point, project, return_value)
+                    res = self.look_corner_down_right(point, project, return_value)
                     if res:
                         return res
-                    res = self.look_down(point, project, return_value)
+                    res = self.look_corner_down_left(point, project, return_value)
                     if res:
                         return res
 
         for point in edge_down:
             if point.content == '#':
                 if not return_value:
-                    self.look_down(point, project)
-                    self.look_left(point, project)
+                    self.look_corner_down_left(point, project)
+                    self.look_corner_up_left(point, project)
                 else:
-                    res = self.look_down(point, project, return_value)
+                    res = self.look_corner_down_left(point, project, return_value)
                     if res:
                         return res
-                    res = self.look_left(point, project, return_value)
+                    res = self.look_corner_up_left(point, project, return_value)
                     if res:
                         return res
 
         for point in edge_left:
             if point.content == '#':
                 if not return_value:
-                    self.look_left(point, project)
+                    self.look_corner_up_left(point, project)
                 else:
-                    res = self.look_left(point, project, return_value)
+                    res = self.look_corner_up_left(point, project, return_value)
                     if res:
                         return res
 
-    def look_up(self, coord, project, return_value=False):
+    def look_straight_up(self, coord, project, return_value=False):
+        res = None
+        cur_point = coord.point[:]
+        cur_point[0] -= self.distance
+        while cur_point[0] != coord.point[0]:
+            if 0 <= cur_point[0]:
+                res = self.check_builds_around(coord, cur_point, project, res, return_value)
+            cur_point[0] += 1
+        return res
+        pass
+
+    def look_corner_up_right(self, coord, project, return_value=False):
         res = None
         cur_point = coord.point[:]
         cur_point[0] -= self.distance
         cur_step = ((coord.point[0] - cur_point[0]) - self.distance) + 1
         while cur_point[0] != coord.point[0]:
-            if 0 <= cur_point[0]:
+            if cur_point[0] >= 0:
                 for column in range(cur_step):
                     if cur_point[1] < self.columns:
                         res = self.check_builds_around(coord, cur_point, project, res, return_value)
+                        if res and return_value:
+                            return res
                         cur_point[1] += 1
             cur_point[1] = coord.point[1]
             cur_point[0] += 1
             cur_step += 1
         return res
 
-    def look_right(self, coord, project, return_value=False):
+    def look_straight_right(self, coord, project, return_value=False):
+        res = None
+        cur_point = coord.point[:]
+        cur_point[1] += self.distance
+        while cur_point[1] != coord.point[1]:
+            if cur_point[1] < self.columns:
+                res = self.check_builds_around(coord, cur_point, project, res, return_value)
+            cur_point[1] -= 1
+        return res
+
+    def look_corner_down_right(self, coord, project, return_value=False):
         res = None
         cur_point = coord.point[:]
         cur_point[1] += self.distance
@@ -235,13 +258,25 @@ class City:
                 for row in range(cur_step):
                     if cur_point[0] < self.rows:
                         res = self.check_builds_around(coord, cur_point, project, res, return_value)
+                        if res and return_value:
+                            return res
                         cur_point[0] += 1
             cur_point[0] = coord.point[0]
             cur_point[1] -= 1
             cur_step += 1
         return res
 
-    def look_down(self, coord, project, return_value=False):
+    def look_straight_down(self, coord, project, return_value=False):
+        res = None
+        cur_point = coord.point[:]
+        cur_point[0] += self.distance
+        while cur_point[0] != coord.point[0]:
+            if cur_point[0] < self.rows:
+                res = self.check_builds_around(coord, cur_point, project, res, return_value)
+            cur_point[0] -= 1
+        return res
+
+    def look_corner_down_left(self, coord, project, return_value=False):
         res = None
         cur_point = coord.point[:]
         cur_point[0] += self.distance
@@ -252,22 +287,36 @@ class City:
                     if cur_point[1] >= 0:
                         res = self.check_builds_around(coord, cur_point, project, res, return_value)
                         cur_point[1] -= 1
+                        if res and return_value:
+                            return res
             cur_point[1] = coord.point[1]
             cur_point[0] -= 1
             cur_step += 1
         return res
 
-    def look_left(self, coord, project, return_value=False):
+    def look_straight_left(self, coord, project, return_value=False):
         res = None
         cur_point = coord.point[:]
         cur_point[1] -= self.distance
+        while cur_point[1] != coord.point[1]:
+            if cur_point[1] >= 0:
+                res = self.check_builds_around(coord, cur_point, project, res, return_value)
+            cur_point[1] += 1
+        return res
+
+    def look_corner_up_left(self, coord, project, return_value=False):
+        res = None
+        cur_point = coord.point[:]
+        cur_point[1] += self.distance
         cur_step = ((coord.point[1] - cur_point[1]) - self.distance) + 1
         while cur_point[1] != coord.point[1]:
             if cur_point[1] >= 0:
                 for rows in range(cur_step):
                     if cur_point[0] >= 0:
                         res = self.check_builds_around(coord, cur_point, project, res, return_value)
-                        cur_point[0] += 1
+                        if res and return_value:
+                            return res
+                        cur_point[0] -= 1
             cur_point[0] = coord.point[0]
             cur_point[1] += 1
             cur_step += 1
