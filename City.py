@@ -1,9 +1,7 @@
-from collections import OrderedDict
-
-from Coordinate.CityCoordinate import CityCoordinate
-from Coordinate.CityCoordinateUtility import CityCoordinateUtility
 from Buildings.Residential import *
 from Buildings.Utility import *
+from collections import OrderedDict
+from Coordinate.CityCoordinateUtility import CityCoordinateUtility
 import copy
 
 
@@ -11,6 +9,18 @@ def null_coordinate(coordinate):
     coordinate.id = None
     coordinate.content = 0
     coordinate.build_type = None
+
+
+def save_structure(structure):
+    res_structure = []
+    for i in range(len(structure)-1):
+        res_structure.append(structure[i][:-1])
+    var = structure[len(structure)-1][-1]
+    if var == '\n':
+        res_structure.append(structure[len(structure)-1][:-1])
+    else:
+        res_structure.append(structure[len(structure) - 1])
+    return res_structure
 
 
 class City:
@@ -110,7 +120,7 @@ class City:
         coordinate.build_type = self.mock_project.type
         coordinate.id = self.mock_project.id
         self.city[top_left_corner[0]][top_left_corner[1]] = coordinate
-        neighbour = self.look_around(self.mock_project, True)
+        neighbour = self.look_around_from_spot(self.mock_project)
         null_coordinate(self.city[top_left_corner[0]][top_left_corner[1]])
         if neighbour:
             u = list(self.possible_utilities.keys())[0]
@@ -126,9 +136,9 @@ class City:
     def __build_house(self, house, top_left_corner):
         # info = [house.type, house.rows, house.columns, house.capacity, house.project_number, house.structure]
         # project = Residential(house)
-        project = copy.deepcopy(house)
-        project.left_top_corner = top_left_corner[:]
-        project.coordinates = project.mathematical(project.type)
+        project = house.get_copy(top_left_corner[:])
+        # project.left_top_corner = top_left_corner[:]
+        # project.coordinates = project.mathematical(project.type)
         project.id = self.curr_proj_id
         self.curr_proj_id += 1
 
@@ -148,6 +158,22 @@ class City:
         else:
             self.utilities.append(project)
 
+    def look_around_from_spot(self, project):
+        spot = project.coordinates[0][0]
+        res = self.look_straight_up(spot, spot, True)
+        if res:
+            return res
+        res = self.look_straight_right(spot, spot, True)
+        if res:
+            return res
+        res = self.look_straight_down(spot, spot, True)
+        if res:
+            return res
+        res = self.look_straight_left(spot, spot, True)
+        if res:
+            return res
+        return None
+
     def look_around(self, project, return_value=False):
         edge_up = project.coordinates[0]
         edge_right = []
@@ -160,52 +186,66 @@ class City:
         for point in edge_up:
             if point.content == '#':
                 if not return_value:
-                    self.look_corner_up_left(point, project)
-                    self.look_corner_up_right(point, project)
-                    self.look_corner_down_right(point, project)
+                    if point.point == project.left_top_corner:
+                        self.look_corner_up_left(point, project)
+                    elif point.point[1] == ((project.left_top_corner[1] + project.columns) - 1):
+                        self.look_corner_up_right(point, project)
+                    else:
+                        self.look_straight_up(point, project)
                 else:
-                    res = self.look_corner_up_left(point, project, return_value)
-                    if res:
-                        return res
-                    res = self.look_corner_up_right(point, project, return_value)
-                    if res:
-                        return res
-                    res = self.look_corner_down_right(point, project, return_value)
-                    if res:
-                        return res
+                    if point.point == project.left_top_corner:
+                        res = self.look_corner_up_left(point, project, return_value)
+                        if res:
+                            return res
+                    elif point.point[1] == ((project.left_top_corner[1] + project.columns) - 1):
+                        res = self.look_corner_up_right(point, project, return_value)
+                        if res:
+                            return res
+                    else:
+                        res = self.look_straight_up(point, project, return_value)
+                        if res:
+                            return res
 
         for point in edge_right:
             if point.content == '#':
                 if not return_value:
-                    self.look_corner_down_right(point, project)
-                    self.look_corner_down_left(point, project)
+                    row = project.left_top_corner[0] + project.rows
+                    column = project.left_top_corner[1] + project.columns
+                    if point.point == [row, column]:
+                        self.look_corner_down_right(point, project)
+                    else:
+                        self.look_straight_right(point, project)
                 else:
-                    res = self.look_corner_down_right(point, project, return_value)
-                    if res:
-                        return res
-                    res = self.look_corner_down_left(point, project, return_value)
-                    if res:
-                        return res
+                    row = project.left_top_corner[0] + project.rows
+                    column = project.left_top_corner[1] + project.columns
+                    if point.point == [row, column]:
+                        res = self.look_corner_down_right(point, project, return_value)
+                        if res:
+                            return res
+                    else:
+                        res = self.look_straight_right(point, project, return_value)
+                        if res:
+                            return res
 
         for point in edge_down:
             if point.content == '#':
                 if not return_value:
-                    self.look_corner_down_left(point, project)
-                    self.look_corner_up_left(point, project)
+                    if point.point[1] == project.left_top_corner[1]:
+                        self.look_corner_down_left(point, project)
+                    else:
+                        self.look_straight_down(point, project)
                 else:
-                    res = self.look_corner_down_left(point, project, return_value)
-                    if res:
-                        return res
-                    res = self.look_corner_up_left(point, project, return_value)
-                    if res:
-                        return res
+                    if point.point[1] == project.left_top_corner[1]:
+                        self.look_corner_down_left(point, project, return_value)
+                    else:
+                        self.look_straight_down(point, project, return_value)
 
         for point in edge_left:
             if point.content == '#':
                 if not return_value:
-                    self.look_corner_up_left(point, project)
+                    self.look_straight_left(point, project)
                 else:
-                    res = self.look_corner_up_left(point, project, return_value)
+                    res = self.look_straight_left(point, project, return_value)
                     if res:
                         return res
 
@@ -307,7 +347,7 @@ class City:
     def look_corner_up_left(self, coord, project, return_value=False):
         res = None
         cur_point = coord.point[:]
-        cur_point[1] += self.distance
+        cur_point[1] -= self.distance
         cur_step = ((coord.point[1] - cur_point[1]) - self.distance) + 1
         while cur_point[1] != coord.point[1]:
             if cur_point[1] >= 0:
@@ -367,11 +407,13 @@ class City:
 
             construction = new[1][build]
 
+            structure = save_structure(construction)
+
             if info_about_building[0][0] == 'R':
-                new_build = Residential(info_about_building, construction)
+                new_build = Residential(info_about_building, structure)
                 self.possible_residentials.append(new_build)
             else:
-                new_build = Utility(info_about_building, construction)
+                new_build = Utility(info_about_building, structure)
                 self.possible_utilities.append(new_build)
 
         return result

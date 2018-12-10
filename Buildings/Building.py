@@ -10,22 +10,15 @@ class Building:
         self.type = general_information[0]
         self.rows = int(general_information[1])
         self.columns = int(general_information[2])
-        self.structure = []
+        self.structure = structure
         self.left_top_corner = left_top_corner
         self.project_number = general_information[4]
-        self.save_structure(structure)
-        self.coordinates = self.mathematical()
+        if left_top_corner:
+            self.coordinates = self.mathematical(self.type)
+        else:
+            self.coordinates = self.mathematical()
         self.size = self.get_building_size()
         self.id = None
-
-    def save_structure(self, structure):
-        for i in range(len(structure)-1):
-            self.structure.append(structure[i][:-1])
-        var = structure[len(structure)-1][-1]
-        if var == '\n':
-            self.structure.append(structure[len(structure)-1][:-1])
-        else:
-            self.structure.append(structure[len(structure) - 1])
 
     def draw(self):
         for i in self.structure:
