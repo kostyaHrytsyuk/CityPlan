@@ -17,7 +17,7 @@ class City:
         self.possible_residentials = []
         self.possible_utilities = []
         self.residentials = {}
-        self.utilities = {}
+        self.utilities = []
         sorted_information = City.__make_city(self, data)
         city_info = str(sorted_information[0]).split()
         self.rows = int(city_info[0])
@@ -47,7 +47,13 @@ class City:
         if not found:
             first_building = self.possible_residentials[0]
 
-        self.__make_square(first_building, [0, 0])
+        row = 0
+        column = 0
+        while row < self.rows:
+            column = 0
+            while column < self.columns:
+                column += self.__make_square(first_building, [row, column])
+            row += first_building.rows * 3
         print()
 
     def __check_building_possibility(self, building, row, column):
@@ -64,11 +70,12 @@ class City:
         return True
 
     def __make_square(self, residential, top_left_corner):
-        row = top_left_corner[0]
+        cur_point = top_left_corner[:]
+        row = cur_point[0]
         counter = 0
 
         while row < self.rows and counter < 3:
-            column = top_left_corner[1]
+            column = cur_point[1]
             for _ in range(3):
                 if column < self.columns:
                     if self.__check_building_possibility(residential, row, column):
@@ -79,20 +86,21 @@ class City:
                             column += residential.columns
             row += residential.rows
             counter += 1
-        top_left_corner[0] = residential.rows
-        top_left_corner[1] = residential.columns
-        self.__fill_square_with_utilities(top_left_corner, residential)
-        print()
+        cur_point[0] += residential.rows
+        cur_point[1] += residential.columns
+        self.__fill_square_with_utilities(cur_point, residential)
+        return residential.columns * 3
 
     def __fill_square_with_utilities(self, top_left_corner, square_element):
-        cur_point = top_left_corner[:]
+        cur_point = top_left_corner
         for row in range(top_left_corner[0], (top_left_corner[0] + square_element.rows)):
-            cur_point[1] = top_left_corner[1]
-            for column in range(top_left_corner[1], (top_left_corner[1] + square_element.columns)):
-                if self.city[row][column].content != '#':
-                    best_utility = self.__find_best_utility([row, column])
-                    if best_utility:
-                        self.__build_house(best_utility, [row, column])
+            if row < self.rows:
+                cur_point[1] = top_left_corner[1]
+                for column in range(top_left_corner[1], (top_left_corner[1] + square_element.columns)):
+                    if column < self.columns and self.city[row][column].content != '#':
+                        best_utility = self.__find_best_utility([row, column])
+                        if best_utility:
+                            self.__build_house(best_utility, [row, column])
 
     def __find_best_utility(self, top_left_corner):
         # TODO: Rewrite neighbour search
@@ -130,12 +138,11 @@ class City:
                 coordinate.project_number = project.project_number
                 self.city[coordinate.point[0]][coordinate.point[1]] = coordinate
 
+        self.look_around(project)
         if project.type == 'R':
-            self.look_around(project)
             self.residentials.update({project.id: project})
         else:
-            self.look_around(project)
-            self.utilities.update({project.id: project})
+            self.utilities.append(project)
 
     def look_around(self, project, return_value=False):
         edge_up = project.coordinates[0]
