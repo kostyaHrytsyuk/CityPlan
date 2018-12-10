@@ -125,7 +125,7 @@ class City:
         if neighbour:
             u = list(self.possible_utilities.keys())[0]
             while u <= len(self.possible_utilities.keys()):
-                if not neighbour.is_utility_around(u):
+                if not neighbour.is_utility_around(u) and u in self.possible_utilities:
                     for utility in self.possible_utilities[u]:
                         if self.__check_building_possibility(utility, top_left_corner[0], top_left_corner[1]):
                             return utility
