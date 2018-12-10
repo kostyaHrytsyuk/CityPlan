@@ -48,7 +48,6 @@ class City:
             first_building = self.possible_residentials[0]
 
         row = 0
-        column = 0
         while row < self.rows:
             column = 0
             while column < self.columns:
@@ -340,4 +339,5 @@ class City:
     def get_score(self):
         score = 0
         for r in self.residentials:
-            score += r.capacity * len(r.utilities_around)
+            score += self.residentials[r].capacity * len(self.residentials[r].utilities_around)
+        return score

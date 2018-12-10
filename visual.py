@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     new_city = City(information)
     new_city.build()
-    new_city.get_score()
+    score = new_city.get_score()
     # TODO: Rewrite according to new utilities collection structure
     # for i in new_city.possible_utilities:
     #     print("----Utility {}----".format(i.project_number))
@@ -28,4 +28,4 @@ if __name__ == '__main__':
     #     size = i.size
     #     print("Profit : {}".format(i.profit))
 
-    print()
+    print(score)
