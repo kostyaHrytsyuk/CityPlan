@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from Coordinate.CityCoordinate import CityCoordinate
+from Coordinate.CityCoordinateUtility import CityCoordinateUtility
 from Buildings.Residential import *
 from Buildings.Utility import *
 import copy
@@ -104,8 +105,7 @@ class City:
     def __find_best_utility(self, top_left_corner):
         # TODO: Rewrite neighbour search
         self.mock_project.left_top_corner = top_left_corner[:]
-        self.mock_project.coordinates = self.mock_project.mathematical()
-        self.mock_project.type = 'U'
+        self.mock_project.coordinates = self.mock_project.mathematical('U')
         coordinate = self.mock_project.coordinates[0][0]
         coordinate.build_type = self.mock_project.type
         coordinate.id = self.mock_project.id
@@ -124,18 +124,23 @@ class City:
                 return None
 
     def __build_house(self, house, top_left_corner):
+        # info = [house.type, house.rows, house.columns, house.capacity, house.project_number, house.structure]
+        # project = Residential(house)
         project = copy.deepcopy(house)
         project.left_top_corner = top_left_corner[:]
-        project.coordinates = project.mathematical()
+        project.coordinates = project.mathematical(project.type)
         project.id = self.curr_proj_id
         self.curr_proj_id += 1
 
         for i in range(project.rows):
-            for coordinate in project.coordinates[i]:
-                coordinate.id = project.id
-                coordinate.build_type = project.type
-                coordinate.project_number = project.project_number
-                self.city[coordinate.point[0]][coordinate.point[1]] = coordinate
+            for coord in project.coordinates[i]:
+                if project.type == 'U':
+                    point = coord.point
+                    coord = CityCoordinateUtility(point[0], point[1], coord.content, None, project.service_type)
+                coord.build_type = project.type
+                coord.project_number = project.project_number
+                coord.id = project.id
+                self.city[coord.point[0]][coord.point[1]] = coord
 
         self.look_around(project)
         if project.type == 'R':
@@ -277,7 +282,7 @@ class City:
                 neighbour = self.residentials[spot.id]
                 if not return_value:
                     if not neighbour.is_utility_around(project.service_type):
-                        neighbour.utilities_around.append(project)
+                        neighbour.utilities_around.append(project.service_type)
                 else:
                     res = neighbour
         return res
@@ -296,7 +301,7 @@ class City:
 
             for index_element in range(1, len(data)):
                 if data[index_element][0] == 'R' or data[index_element][0] == 'U':
-                    length = data[index_element][2]
+                    length = data[index_element].split()[1]
                     build_info.append([data[index_element], project_counter])
                     project_counter += 1
                     temporary_lst = data[int(index_element + 1):int(index_element) + 1 + int(length)]

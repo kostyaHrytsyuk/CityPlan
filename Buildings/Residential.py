@@ -10,7 +10,7 @@ class Residential(Building):
         self.utilities_around = []
 
     def is_utility_around(self, utility_type):
-        for u in self.utilities_around:
-            if utility_type == u.service_type:
+        if len(self.utilities_around) != 0:
+            if utility_type in self.utilities_around:
                 return True
         return False

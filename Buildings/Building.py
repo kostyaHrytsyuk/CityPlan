@@ -1,4 +1,5 @@
 from Coordinate.Coordinates import *
+from Coordinate.CityCoordinate import CityCoordinate
 from ManhattanHelper import *
 
 
@@ -30,7 +31,7 @@ class Building:
         for i in self.structure:
             print(i)
 
-    def mathematical(self):
+    def mathematical(self, build_type=None):
         bld_model = []
         counter = 0
         for i in range(self.left_top_corner[0], self.left_top_corner[0] + len(self.structure)):
@@ -52,7 +53,11 @@ class Building:
         for row in range(len(bld_model)):
             coordinates.append([])
             for q in range(len(bld_model[row])):
-                coordinates[row].append(Coordinates(bld_model[row][q][0], bld_model[row][q][1], bld_model[row][q][2]))
+                data = [bld_model[row][q][0], bld_model[row][q][1], bld_model[row][q][2]]
+                if build_type:
+                    coordinates[row].append(CityCoordinate(data[0], data[1], data[2], build_type))
+                else:
+                    coordinates[row].append(Coordinates(data[0], data[1], data[2]))
 
         return coordinates
 
