@@ -1,6 +1,8 @@
 <h1 align="center">Google Hash Code 2018 Final Round</h1>
 <p align="center">
-  <img src="event_google-hash-code_491696.jpg">
+  <a href="https://codingcompetitions.withgoogle.com/hashcode" target="_blank">
+    <img src="event_google-hash-code_491696.jpg">
+  </a>
 </p>
 
 <h3 align="center">Description of the algorithms that were used</h3>
