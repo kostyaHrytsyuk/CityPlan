@@ -1,8 +1,9 @@
 <h1 align="center">Google Hash Code 2018 Final Round</h1>
+
+This is the our solution for [Google Hash Code 2018 Final round](https://hashcode.withgoogle.com) task. The problem itself: [City Plan](https://storage.googleapis.com/coding-competitions.appspot.com/HC/2018/hashcode2018_final_task.pdf)
+
 <p align="center">
-  <a href="https://codingcompetitions.withgoogle.com/hashcode" target="_blank">
     <img src="event_google-hash-code_491696.jpg">
-  </a>
 </p>
 
 <h3 align="center">Description of the algorithms that were used</h3>
